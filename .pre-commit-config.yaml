@@ -1,6 +1,11 @@
 default_language_version:
   python: python3
-exclude: ^tests/samples/mqt-diffs/.*
+exclude: |
+  (?x)
+  # Files that fail if changed manually
+  .*\.(diff|patch)$|
+  # You don't usually want a bot to modify your legal texts
+  (LICENSE.*|COPYING.*)
 repos:
   - repo: local
     hooks:
