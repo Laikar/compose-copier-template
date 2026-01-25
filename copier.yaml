@@ -4,6 +4,16 @@ _answers_file: .common_config.yml
 _subdirectory: src
 _external_data:
   secrets: secrets/template.yml
+
+compose_provider:
+  type: str
+  help: Container runtime to use
+  choices:
+    Docker: docker
+    Podman root: podman
+    Podman rootless: podman_rootless
+  default: "docker"
+
 service_name:
   type: str
   help: Name of the service. This will be used for container names, network aliases, and default hostnames.

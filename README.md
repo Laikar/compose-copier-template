@@ -11,25 +11,20 @@
 
 # Docker Compose Template Generator
 
-A **Copier template** for bootstrapping docker(or podman)compose projects with soem defaults.
-
-This template generates my prefered configurations for selfhosting apps using docker compose:
-
-- **Justfile** with common tasks.
-- **Traefik** reverse proxy configuration
-- **Authentik** authentication & forward-auth integration
-- **Automated Borg backups** for persistent data
+A **Copier template** for bootstrapping docker(or podman)compose projects with my prefered integrations into other self hosted services.
 
 ## Features
 
-- SSO integration with authentik
-- Routing with traefik without exposing docker socket
-- Monitoring config with gatus
+- **Justfile** with common tasks.
+- **gitignore** and **pre-commit** config.
+- Reverse proxy with **Traefik**
+- Single Sign On with **Authentik**
+- Uptime monitoring with **Gatus**
 
 ## Usage
 
 ```bash
-copier copy <template-repo-url> <destination>
+copier copy https://github.com/Laikar/compose-copier-template <destination>
 ```
 
 Answer the prompts, then start your stack with:

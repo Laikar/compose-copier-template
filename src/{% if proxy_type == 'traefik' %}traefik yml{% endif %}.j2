@@ -1,16 +1,26 @@
+{% set middlewares = ['common'] +
+  (['authentik_proxy_auth'] if 'proxy' in auth_types else [])
+%}
+
 http:
   routers:
-    {{ service_name}}:
+    {{ service_name }}:
       rule: "Host(`{{ public_domain }}`)"
       entryPoints:
         - websecure
-      service: {{ service_name}}
-      middlewares:
-        - common
+      service: {{ service_name }}
+      priority: 10
+      middlewares: {{ middlewares }}
       tls:
-        certResolver: cloudflare
+        certResolver: letsencrypt
+{% if 'proxy' in auth_types %}
+    {{ service_name }}_auth:
+      rule: "Host(`{{ public_domain }}`) && PathPrefix(`/outpost.goauthentik.io/`)"
+      priority: 15
+      service: authentik
+{% endif %}
   services:
-    {{ service_name}}:
+    {{ service_name }}:
       loadBalancer:
         servers:
           - url: "http://{{ service_host }}:{{ internal_port }}"

@@ -1,16 +1,21 @@
+{% set compose_command = (
+    "sudo podman compose" if compose_provider == "podman" else
+    "podman compose" if compose_provider == "podman_rootless" else
+    "docker compose"
+) %}
 
 _default:
     just --choose
 
-start *args="-d": link_configs
-    sudo podman compose up {{ args }}
+start *args="-d": {% if config_file_name -%}link_configs{%- endif %}
+    {{ compose_command }} up {% raw%}{{ args }}{% endraw %}
 stop *args:
-    sudo podman compose down {{ args }}
+    {{ compose_command }} down {% raw%}{{ args }}{% endraw %}
 
 pull *args:
-    sudo podman compose pull {{ args }}
+    {{ compose_command }} pull {% raw%}{{ args }}{% endraw %}
 logs *args:
-    sudo podman compose logs {{ args }}
+    {{ compose_command }} logs {% raw%}{{ args }}{% endraw %}
 restart: stop && start
     echo "Restarting"
 
