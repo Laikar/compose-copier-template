@@ -1,0 +1,51 @@
+_default:
+    just --choose
+
+start *args="-d":
+    sudo podman compose up {% raw %}{{ args }}{% endraw %}
+
+stop *args:
+    sudo podman compose down {% raw %}{{ args }}{% endraw %}
+
+
+pull *args:
+    sudo podman compose pull {% raw %}{{ args }}{% endraw %}
+
+logs *args:
+    sudo podman compose logs {% raw %}{{ args }}{% endraw %}
+
+restart: stop && start
+    echo "Restarting"
+
+update: pull && restart
+    echo "Updating"
+
+{% if test_env -%}
+delete:
+    just stop -v --remove-orphans
+    {% for folder_name, path in folders if folder_name.replace(service_name ~ "_", "") != home -%}
+    sudo rm -rf {{ folder }}/*
+    {% endfor %}
+{% endif %}
+{% if db_type == "postgres" -%}
+pg_dump *args:
+    sudo podman compose exec db pg_dump {% raw %}{{args}}{% endraw %}
+
+pg_restore *args:
+    sudo podman compose exec db pg_restore {% raw %}{{args}}{% endraw %}
+
+psql *args:
+    sudo podman compose exec db psql {% raw %}{{args}}{% endraw %}
+{% elif db_type == "mariadb" -%}
+mariadb *args:
+    sudo podman compose exec db mariadb {% raw %}{{args}}{% endraw %}
+
+mariadb-dump *args:
+    sudo podman compose exec db mariadb-dump {% raw %}{{args}}{% endraw %}
+{% endif %}
+
+{% if enable_backups  -%}
+backup:
+    #!/usr/bin/env bash
+    borgmatic -c {{ borg_home }}/conf.d/{{ name }}.yml create
+{% endif %}

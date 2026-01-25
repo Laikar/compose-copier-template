@@ -1,0 +1,41 @@
+
+_default:
+    just --choose
+
+start *args="-d": link_configs
+    sudo podman compose up {{ args }}
+stop *args:
+    sudo podman compose down {{ args }}
+
+pull *args:
+    sudo podman compose pull {{ args }}
+logs *args:
+    sudo podman compose logs {{ args }}
+restart: stop && start
+    echo "Restarting"
+
+update: pull && restart
+    echo "Updating"
+
+{% if config_file_name -%}
+link_configs FILE_NAME={{ config_file_name }}:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    DEST_DIR="./config.d"
+    mkdir -p "$DEST_DIR"
+
+    for DIR in "/opt/*/"; do
+        FILE="$DIR/$FILE_NAME"
+        if [ -f "$FILE" ]; then
+            PARENT_FOLDER=$(basename "$DIR")
+            DEST_FILE="$DEST_DIR/${PARENT_FOLDER}.yml"
+
+            if [ -e "$DEST_FILE" ]; then
+                continue
+            fi
+
+            ln "$FILE" "$DEST_FILE" && echo "Linked $FILE -> $DEST_FILE"
+        fi
+    done
+{%- endif %}

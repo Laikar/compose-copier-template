@@ -1,0 +1,88 @@
+{% if 'oidc' in auth_types -%}
+resource "authentik_provider_oauth2" "{{ service_name }}" {
+  name      = "{{ service_name }}"
+  client_id = "{{ oidc_client_id }}"
+  property_mappings = data.authentik_property_mapping_provider_scope.default.ids
+  authentication_flow = data.authentik_flow.default-authentication-flow.id
+  authorization_flow = data.authentik_flow.default-authorization-flow.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
+  access_token_validity = "minutes=10"
+  lifecycle {
+    ignore_changes = [
+      signing_key, sub_mode
+    ]
+  }
+  allowed_redirect_uris = []
+  client_type = "confidential"
+  sub_mode = "hashed_user_id"
+  client_secret = "{{ oidc_client_secret }}"
+
+}
+
+resource "authentik_application" "{{ service_name }}" {
+  name              = "{{ service_name | title }}"
+  slug              = "{{ service_name }}"
+  meta_launch_url   = "https://{{ public_domain }}"
+  protocol_provider = authentik_provider_oauth2.{{ service_name }}.id
+
+  lifecycle {
+    ignore_changes = [
+      name,meta_icon
+    ]
+  }
+}
+{%- endif %}
+
+{% if 'ldap' in auth_types -%}
+resource "authentik_provider_ldap" "{{ service_name }}" {
+  name      = "{{ service_name }}"
+  base_dn   = "{{ ldap_search_domain }}"
+  bind_flow = data.authentik_flow.default-authentication-flow.id
+  unbind_flow  = data.authentik_flow.default-invalidation-flow.id
+
+
+#  search_group = resource.authentik_group.ldap-search-group.id
+}
+
+resource "authentik_application" "{{ service_name }}" {
+  name              = "{{ service_name }}"
+  slug              = "{{ service_name }}"
+  meta_launch_url   = "https://{{ public_domain }}"
+  protocol_provider = authentik_provider_ldap.{{ service_name }}.id
+  lifecycle {
+    ignore_changes = [
+      name,meta_icon
+    ]
+  }
+}
+{%- endif %}
+
+{% if 'proxy' in auth_types -%}
+resource "authentik_provider_proxy" "{{ service_name }}" {
+  name               = "{{ service_name |title}}"
+  internal_host      = "http://{{ internal_host }}:{{internal_port}}"
+  external_host      = "https://{{ servpublic_domainice_name }}/"
+  mode = "forward_single"
+  authorization_flow = data.authentik_flow.default-authorization-flow.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
+  access_token_validity = "weeks=1"
+  lifecycle {
+    ignore_changes = [
+      skip_path_regex
+    ]
+  }
+}
+
+resource "authentik_application" "{{ service_name }}" {
+  name              = "{{ service_name | title }}"
+  slug              = "{{ service_name }}"
+  meta_launch_url   = "https://{{ public_domain }}"
+  protocol_provider = authentik_provider_oauth2.{{ service_name }}.id
+
+  lifecycle {
+    ignore_changes = [
+      name,meta_icon
+    ]
+  }
+}
+{%- endif %}

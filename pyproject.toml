@@ -1,0 +1,5 @@
+[dependency-groups]
+dev = [
+    "copier>=9.7.1",
+    "pytest>=9.0.2",
+]

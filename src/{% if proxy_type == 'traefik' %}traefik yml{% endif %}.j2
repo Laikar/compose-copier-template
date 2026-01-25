@@ -1,0 +1,17 @@
+http:
+  routers:
+    {{ service_name}}:
+      rule: "Host(`{{ public_domain }}`)"
+      entryPoints:
+        - websecure
+      service: {{ service_name}}
+      middlewares:
+        - common
+      tls:
+        certResolver: cloudflare
+  services:
+    {{ service_name}}:
+      loadBalancer:
+        servers:
+          - url: "http://{{ service_host }}:{{ internal_port }}"
+        passHostHeader: true
