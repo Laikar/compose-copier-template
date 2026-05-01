@@ -1,0 +1,20 @@
+db_type:
+  type: str
+  help: Which db does the service use?
+  choices:
+    No DB: false
+    Postgres: postgres
+    MariaDB: mariadb
+    sqlite: sqlite
+db_name:
+  help: Database name
+  when: "{{ db_type in ['postgres','mariadb']}}"
+  default: "{{ service_name }}"
+db_user:
+  help: Database username
+  when: "{{ db_type in ['postgres','mariadb']}}"
+  default: "{{ service_name }}"
+db_password:
+  help: Database password
+  when: "{{ db_type in ['postgres','mariadb']}}"
+  default: "{{ service_name }}"

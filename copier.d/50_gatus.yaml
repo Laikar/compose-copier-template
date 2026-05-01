@@ -1,0 +1,12 @@
+gatus_builtin_username:
+  type: str
+  help: "Username for the builtin admin"
+  default: "admin"
+  when: "{{ service_name == 'gatus' }}"
+
+gatus_builtin_password:
+  type: str
+  help: "Password for the builtin admin"
+  secret: true
+  default: "changeme"
+  when: "{{ service_name == 'gatus' }}"

@@ -1,0 +1,71 @@
+{% set compose_command = (
+    "sudo podman compose" if compose_provider == "podman" else
+    "podman compose" if compose_provider == "podman_rootless" else
+    "docker compose"
+) %}
+
+_default:
+    just --choose
+
+start *args="-d": {% if config_file_name -%}link_configs{%- endif %}
+    {{ compose_command }} up {% raw%}{{ args }}{% endraw %}
+stop *args:
+    {{ compose_command }} down {% raw%}{{ args }}{% endraw %}
+
+pull *args:
+    {{ compose_command }} pull {% raw%}{{ args }}{% endraw %}
+logs *args:
+    {{ compose_command }} logs {% raw%}{{ args }}{% endraw %}
+restart: stop && start
+    echo "Restarting"
+
+update: pull && restart
+    echo "Updating"
+
+{% if config_file_name -%}
+sync_configs:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    CONFIG_DIR="{{ _folder_name }}/config.d"
+    CONFIG_FILE="{{ config_file_name }}"
+    EXT="{{ config_file_name.split('.') | last }}"
+    mkdir -p "$CONFIG_DIR"
+    # Link other/this.conf to this/conf.d/other.conf
+    for DIR in /opt/*/; do
+        FILE="$DIR/$CONFIG_FILE"
+        if [ -f "$FILE" ]; then
+            PARENT_FOLDER=$(basename "$DIR")
+            DEST_FILE="$CONFIG_DIR/${PARENT_FOLDER}.${EXT}"
+            if [ -e "$DEST_FILE" ]; then
+                continue
+            fi
+            ln "$FILE" "$DEST_FILE" && echo "Linked $FILE -> $DEST_FILE"
+        fi
+    done
+    # Link this/conf.d/other.conf to other/this.conf
+    for FILE in "$CONFIG_DIR"/*.${EXT}; do
+        # Skip if no files match
+        [ -e "$FILE" ] || continue
+        BASENAME=$(basename "$FILE" .${EXT})
+        TARGET_DIR="/opt/$BASENAME"
+        TARGET_FILE="$TARGET_DIR/$CONFIG_FILE"
+        # Ensure target directory exists
+        if [ ! -d "$TARGET_DIR" ]; then
+            echo "Skipping $FILE (directory $TARGET_DIR does not exist)"
+            continue
+        fi
+        # Skip if present
+        if [ -e "$TARGET_FILE" ]; then
+            continue
+        fi
+        ln "$FILE" "$TARGET_FILE" && echo "Linked $FILE -> $TARGET_FILE"
+    done
+{%- endif %}
+{% if sb_type == 'postgres' -%}
+pg_dump *args:
+    sudo podman compose exec postgresql pg_dump {{args}}
+pg_restore *args:
+    sudo podman compose exec postgresql pg_restore {{args}}
+psql *args:
+    sudo podman compose exec postgresql psql {{args}}
+{%- endif %}

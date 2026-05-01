@@ -1,0 +1,12 @@
+monitoring_types:
+  type: str
+  help: Types of monitoring to enable for this service.
+  choices:
+    Gatus: gatus
+  multiselect: true
+
+gatus_monitoring_url:
+  type: str
+  help: URL that Gatus should use to monitor this service.
+  default: "http://{{ internal_host }}:{{ internal_port }}/"
+  when: "{{ 'gatus' in monitoring_types }}"

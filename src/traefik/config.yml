@@ -1,0 +1,28 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+log:
+  filePath: "/var/log/traefik/traefik.log"
+  format: commonn
+  level: INFO
+accessLog:
+  filePath: "/var/log/traefik/access.log"
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+
+  websecure:
+    address: ":443"
+
+providers:
+  file:
+    directory: /etc/traefik/config.d
+    watch: true

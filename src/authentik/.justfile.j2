@@ -1,0 +1,20 @@
+{% include 'src/common/.justfile.j2' %}
+
+terraform *args:
+    sudo podman run -i --rm --user root -v /opt/authentik/terraform:/workspace:z -w /workspace hashicorp/terraform:light {{ args }}
+init_config:
+    #!/usr/bin/env bash
+    just terraform init
+    pk=$(curl --insecure --header 'Authorization: Bearer n3jeG0kQy7mh22Te' --header 'Accept: application/json' https://authentik.laikar.moe/api/v3/outposts/instances/|jq -r .results[0].pk)
+    just terraform import authentik_outpost.embeded ${pk}
+
+configure_ldap_outpost:
+    #!/usr/bin/env bash
+    id=$(just curl_api https://authentik.laikar.moe/api/v3/outposts/instances/?name__icontains=ldap |jq -r .results[0].token_identifier)
+    token=$(just curl_api https://authentik.laikar.moe/api/v3/core/tokens/${id}/view_key/ |jq -r .key)
+    echo "AUTHENTIK_TOKEN=${token}" > /opt/authentik/.ldap_token.env
+curl_api *args:
+    curl --insecure --header 'Authorization: Bearer n3jeG0kQy7mh22Te' --header 'Accept: application/json' {{args}}
+restart_ldap_outposts:
+    sudo podman compose down ldap_outpost
+    sudo podman compose up -d ldap_outpost

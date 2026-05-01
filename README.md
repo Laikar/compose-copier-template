@@ -11,7 +11,7 @@
 
 # Docker Compose Template Generator
 
-A **Copier template** for bootstrapping docker(or podman)compose projects with my prefered integrations into other self hosted services.
+A **Copier template** for bootstrapping docker(or podman) compose projects with my prefered integrations into other self hosted services.
 
 ## Features
 
@@ -35,5 +35,10 @@ docker compose up -d
 
 ## Roadmap
 
-- Child templates for services I am familiar with.
+- Add services:
+  - Jellyfin
+  - Seafile
+  - Foundryvtt
+  - Immich
+  - Mealie
 - Backups using borgmatic.

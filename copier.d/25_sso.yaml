@@ -1,0 +1,33 @@
+auth_types:
+  type: str
+  help: >-
+    How Single Sign On is handled for this service.
+    Don't select any if you don't want sso
+  choices:
+    OAUTH/OIDC: oidc
+    LDAP: ldap
+    Proxy: proxy
+  multiselect: true
+
+ldap_search_domain:
+  type: str
+  help: LDAP search domain used for authentication.
+  default: "{{ '' if 'ldap' not in auth_types else 'dc=example,dc=com'}}"
+  when: "{{ 'ldap' in auth_types }}"
+
+oidc_client_id:
+  type: str
+  help: OIDC client ID for the service. Defaults to the service name
+  secret: True
+  when: "{{ 'oidc' in auth_types }}"
+  default: "{{ service_name }}"
+
+oidc_client_secret:
+  type: str
+  help: >
+    OIDC client secret. Use a strong secret. You can generate one with:
+
+    `tr -dc 'A-Za-z0-9' </dev/urandom | head -c 20; echo`
+  secret: True
+  when: "{{ 'oidc' in auth_types }}"
+  default: "changeme"

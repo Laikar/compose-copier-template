@@ -1,0 +1,12 @@
+metrics: true
+web:
+  port: 8080
+storage:
+  type: sqlite
+  path: /data/data.db
+
+security:
+  oidc:
+    issuer-url: "https://authentik.laikar.moe/application/o/gatus/"
+    redirect-url: "https://gatus.laikar.moe/authorization-code/callback"
+    scopes: ["openid"]

@@ -1,13 +1,13 @@
 from copier import run_copy
 
 
-class TestTemplate:
-    def test_render_template(self, template_path):
+class TestGeneric:
+    def render_template(self, template_paths):
         run_copy(
             ".",
-            template_path,
+            template_paths.main,
             data={
-                "service_name": "test",
+                "service_name": "common",
                 "proxy_type": "traefik",
                 "public_domain": "test.example.com",
                 "internal_host": "test",
@@ -19,6 +19,7 @@ class TestTemplate:
                 "ldap_search_domain": "dc=example,dc=com",
                 "oidc_client_id": "12345678",
                 "oidc_client_secret": "abcdefghijklmnopqrstuvwxyz",
+                "db_type": False,
             },
             vcs_ref="HEAD",
             defaults=True,

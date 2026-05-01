@@ -1,0 +1,21 @@
+services:
+  traefik:
+    image: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config.yml:/etc/traefik/traefik.yml:ro,Z
+      - ./config.d:/etc/traefik/config.d:ro,Z
+      - ./acme:/var/lib/acme:Z
+      - .secrets/cloudlfare_key:/secrets/cf_key:ro,Z
+      - {{ log_dir }}:/var/log/traefik
+    environment:
+      CF_DNS_API_TOKEN_FILE: /secrets/cf_key
+      TZ: "Europe/Madrid"
+    networks:
+      - internal_net
+networks:
+  internal_net:
+    external: true

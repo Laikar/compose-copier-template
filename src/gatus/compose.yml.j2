@@ -1,0 +1,15 @@
+services:
+  gatus:
+    container_name: gatus
+    image: twinproduction/gatus
+    restart: always
+    volumes:
+      - "./config.d:/config/config.d:Z"
+      - {{ data_dir }}:/data:Z
+    environment:
+      GATUS_CONFIG_PATH: "/config/config.d"
+    networks:
+      internal_net:
+networks:
+  internal_net:
+    external: true

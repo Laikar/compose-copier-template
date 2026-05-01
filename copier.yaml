@@ -1,10 +1,8 @@
-# copier.yaml
 _templates_suffix: .j2
 _answers_file: .common_config.yml
-_subdirectory: src
-_external_data:
-  secrets: secrets/template.yml
-
+_subdirectory: src/{{ service_name }}
+_skip_if_exists:
+  - .secrets/*
 compose_provider:
   type: str
   help: Container runtime to use
@@ -12,174 +10,147 @@ compose_provider:
     Docker: docker
     Podman root: podman
     Podman rootless: podman_rootless
-  default: "docker"
-
+  default: docker
 service_name:
   type: str
-  help: Name of the service. This will be used for container names, network aliases, and default hostnames.
+  help:
+    Name of the service. This will be used for container names, network aliases,
+    and default hostnames.
+config_file_name:
+  type: str
+  help: "Name of the configuration file for this service on each other service's
+    folder. EX: trafik.yml will reside on other projects to specify their traefik
+    config."
+  default: ""
+  placeholder: No file
+log_dir:
+  type: str
+  help: "Log directory.
 
+    This is where the service's logs will be stored.
+
+    "
+  default: /var/log/{{ service_name }}
+data_dir:
+  type: str
+  help: "Data directory.
+
+    This is where the service's data will be stored.
+
+    "
+  default: /var/storage/data/{{ service_name }}
 proxy_type:
   type: str
   choices:
-    No proxy: "none"
-    Traefik: "traefik"
+    No proxy: none
+    Traefik: traefik
   help: Select the type of reverse proxy to use for this service.
-
+  default: none
+  when: "{{ service_name not in ['traefik'] }}"
 public_domain:
   type: str
   help: Public domain where the service will be accessible.
   when: "{{ proxy_type != 'none'}}"
   default: "{{ service_name }}.example.com"
-
 internal_host:
   type: str
   help: Internal hostname or container name where the service is running.
   default: "{{ service_name }}"
-
+  when: "{{ proxy_type != 'none'}}"
 internal_port:
   type: str
   help: Port on which the service is listening internally.
   default: 8080
-
+  when: "{{ proxy_type != 'none'}}"
+internal_network_name:
+  type: str
+  help: Name of the internal netowrk to comunicate with reverse proxy
+  default: internal_net
 monitoring_types:
   type: str
   help: Types of monitoring to enable for this service.
   choices:
     Gatus: gatus
   multiselect: true
-
 gatus_monitoring_url:
   type: str
   help: URL that Gatus should use to monitor this service.
-  default: "http://{{ internal_host }}:{{ internal_port }}/"
+  default: http://{{ internal_host }}:{{ internal_port }}/
   when: "{{ 'gatus' in monitoring_types }}"
-
-config_file_name:
-  type: str
-  help: >
-    Name of the configuration file for this service on each other service's folder.
-    EX: trafik.yml will reside on other projects to specify their traefik config.
-  default: ""
-  placeholder: "No file"
-
 auth_types:
   type: str
-  help: >
-    How Single Sign On is handled for this service.
-    Don't select any if you don't want sso
+  help:
+    How Single Sign On is handled for this service. Don't select any if you don't
+    want sso
   choices:
     OAUTH/OIDC: oidc
     LDAP: ldap
     Proxy: proxy
   multiselect: true
-
 ldap_search_domain:
   type: str
   help: LDAP search domain used for authentication.
   default: "{{ '' if 'ldap' not in auth_types else 'dc=example,dc=com'}}"
   when: "{{ 'ldap' in auth_types }}"
-
 oidc_client_id:
   type: str
-  help: OIDC client ID for the service. Defaults to a randomly generated ID if not provided.
-  secret: True
+  help: OIDC client ID for the service. Defaults to the service name
+  secret: true
   when: "{{ 'oidc' in auth_types }}"
-  default: "{{ _external_data.secrets.oidc_client_id | default((99999999999999999999999999999|ans_random|hash('sha512'))[:8]) }}"
-
+  default: "{{ service_name }}"
 oidc_client_secret:
   type: str
-  help: >
-    OIDC client secret. Use a strong secret. You can generate one with:
+  help: "OIDC client secret. Use a strong secret. You can generate one with:
+
     `tr -dc 'A-Za-z0-9' </dev/urandom | head -c 20; echo`
-  secret: True
+
+    "
+  secret: true
   when: "{{ 'oidc' in auth_types }}"
-  default: "{{ _external_data.secrets.oidc_client_secret | default((99999999999999999999999999999|ans_random|hash('sha512'))[:16]) }}"
-# db_type:
-#   type: str
-#   help: Which db does the service use?
-#   choices:
-#     No DB: no
-#     Postgres: postgres
-#     MariaDB: mariadb
-#     sqlite: sqlite
-# db_name:
-#   help: Database name
-#   when: "{{ db_type in ['postgres','mariadb']}}"
-#   default: "{{ service_name }}"
-# db_user:
-#   help: Database username
-#   when: "{{ db_type in ['postgres','mariadb']}}"
-#   default: "{{ service_name }}"
-# db_password:
-#   help: Database password
-#   when: "{{ db_type in ['postgres','mariadb']}}"
-#   default: "{{ service_name }}"
-# log_dir:
-#   type: str
-#   help: |
-#     Log directory.
-#     This is where the service's logs will be stored.
-#   default: /var/storage/log/{{ service_name }}
-# log_symlinks:
-#   type: yaml
-#   help: |
-#     A list of places where a log symlink should be made.
-#   default:
-#     - /var/log/{{ service_name }}
-#     - "{{ _folder_name}}/logs"
-# data_dir:
-#   type: str
-#   help: |
-#     Data directory.
-#     This is where the service's data will be stored.
-#   default: /var/storage/data/{{ service_name }}
-# data_symlinks:
-#   type: yaml
-#   help: |
-#     A list of places where a data symlink should be made.
-#   default:
-#     - "{{ _folder_name}}/data"
-# config_dir:
-#   type: str
-#   help: |
-#     Configuration directory.
-#     This is where the service's configuration files will be placed.
-#   default: /opt/{{ service_name }}/config/
-# config_symlinks:
-#   type: yaml
-#   help: |
-#     A list of places where a config symlink should be made.
-#   default:
-#     - /etc/{{ service_name }}
-#
-# authentik_config_dir:
-#   type: str
-#   help: |
-#     Authentik configuration directory.
-#     This is where the Authentik configuration files will be placed.
-#   default: /opt/authentik/terraform/
-# borg_config_dir:
-#   type: str
-#   help: |
-#     Authentik configuration directory.
-#     This is where the Authentik configuration files will be placed.
-#   default: /opt/borg/conf.d/
-#
-# backup_service:
-#   type: str
-#   help: |
-#     Enable Borg backups for the service.
-#     If enabled, you will need to provide backup configuration details.
-#   choices:
-#     No Backup: no
-#     Borg: borg
-#
-# remote_borg_repo:
-#   type: str
-#   help: Remote borg repo URl to use for backups, leave empty to backup only to local
-#   deafult: ""
-#
-# internal_network_name:
-#   type: str
-#   help: Name of the internal netowrk to comunicate with reverse proxy
-#   default: internal_net
+  default: changeme
+db_type:
+  type: str
+  help: Which db does the service use?
+  choices:
+    No DB: false
+    Postgres: postgres
+    MariaDB: mariadb
+    sqlite: sqlite
+db_name:
+  help: Database name
+  when: "{{ db_type in ['postgres','mariadb']}}"
+  default: "{{ service_name }}"
+db_user:
+  help: Database username
+  when: "{{ db_type in ['postgres','mariadb']}}"
+  default: "{{ service_name }}"
+db_password:
+  help: Database password
+  when: "{{ db_type in ['postgres','mariadb']}}"
+  default: "{{ service_name }}"
+authentik_bootstrap_token:
+  type: str
+  help: Authentik bootstrap token
+  default: "{{ (99999999999999999999999999999|ans_random|hash('sha512'))[:8] }}"
+  when: "{{ service_name == 'authentik' }}"
+authentik_bootstrap_password:
+  type: str
+  help: Authentik bootstrap password
+  default: "{{ (99999999999999999999999999999|ans_random|hash('sha512'))[:8] }}"
+  when: "{{ service_name == 'authentik' }}"
+authentik_secret_key:
+  type: str
+  help: Authentik secret key
+  default: "{{ (99999999999999999999999999999|ans_random|hash('sha512'))[:64] }}"
+  when: "{{ service_name == 'authentik' }}"
+gatus_builtin_username:
+  type: str
+  help: Username for the builtin admin
+  default: admin
+  when: "{{ service_name == 'gatus' }}"
+gatus_builtin_password:
+  type: str
+  help: Password for the builtin admin
+  secret: true
+  default: changeme
+  when: "{{ service_name == 'gatus' }}"

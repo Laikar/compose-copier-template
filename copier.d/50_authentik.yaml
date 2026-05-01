@@ -1,0 +1,17 @@
+authentik_bootstrap_token:
+  type: str
+  help: "Authentik bootstrap token"
+  default: "{{ (99999999999999999999999999999|ans_random|hash('sha512'))[:8] }}"
+  when: "{{ service_name == 'authentik' }}"
+
+authentik_bootstrap_password:
+  type: str
+  help: "Authentik bootstrap password"
+  default: "{{ (99999999999999999999999999999|ans_random|hash('sha512'))[:8] }}"
+  when: "{{ service_name == 'authentik' }}"
+
+authentik_secret_key:
+  type: str
+  help: "Authentik secret key"
+  default: "{{ (99999999999999999999999999999|ans_random|hash('sha512'))[:64] }}"
+  when: "{{ service_name == 'authentik' }}"

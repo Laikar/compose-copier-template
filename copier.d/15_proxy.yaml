@@ -1,0 +1,30 @@
+proxy_type:
+  type: str
+  choices:
+    No proxy: "none"
+    Traefik: "traefik"
+  help: Select the type of reverse proxy to use for this service.
+  default: "none"
+  when: "{{ service_name not in ['traefik'] }}"
+
+public_domain:
+  type: str
+  help: Public domain where the service will be accessible.
+  when: "{{ proxy_type != 'none'}}"
+  default: "{{ service_name }}.example.com"
+
+internal_host:
+  type: str
+  help: Internal hostname or container name where the service is running.
+  default: "{{ service_name }}"
+  when: "{{ proxy_type != 'none'}}"
+internal_port:
+  type: str
+  help: Port on which the service is listening internally.
+  default: 8080
+  when: "{{ proxy_type != 'none'}}"
+
+internal_network_name:
+  type: str
+  help: Name of the internal netowrk to comunicate with reverse proxy
+  default: internal_net

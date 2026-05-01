@@ -1,0 +1,39 @@
+_templates_suffix: .j2
+_answers_file: .common_config.yml
+_subdirectory: src/{{ service_name }}
+_skip_if_exists:
+  - ".secrets/*"
+compose_provider:
+  type: str
+  help: Container runtime to use
+  choices:
+    Docker: docker
+    Podman root: podman
+    Podman rootless: podman_rootless
+  default: "docker"
+
+service_name:
+  type: str
+  help: Name of the service. This will be used for container names, network aliases, and default hostnames.
+
+config_file_name:
+  type: str
+  help: >-
+    Name of the configuration file for this service on each other service's folder.
+    EX: trafik.yml will reside on other projects to specify their traefik config.
+  default: ""
+  placeholder: "No file"
+
+log_dir:
+  type: str
+  help: |
+    Log directory.
+    This is where the service's logs will be stored.
+  default: /var/log/{{ service_name }}
+
+data_dir:
+  type: str
+  help: |
+    Data directory.
+    This is where the service's data will be stored.
+  default: /var/storage/data/{{ service_name }}
