@@ -15,7 +15,7 @@ services:
       CF_DNS_API_TOKEN_FILE: /secrets/cf_key
       TZ: "Europe/Madrid"
     networks:
-      - internal_net
+      - {{ internal_network_name }}
 networks:
-  internal_net:
+  {{ internal_network_name }}:
     external: true

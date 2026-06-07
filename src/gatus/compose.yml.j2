@@ -9,7 +9,7 @@ services:
     environment:
       GATUS_CONFIG_PATH: "/config/config.d"
     networks:
-      internal_net:
+      {{ internal_network_name }}:
 networks:
-  internal_net:
+  {{ internal_network_name }}:
     external: true

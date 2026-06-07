@@ -27,7 +27,7 @@ services:
       - "${AUTHENTIK_DATA_DIR}/custom-templates:/templates:z"
     networks:
       atk_network:
-      internal_net:
+      {{ internal_network_name }}:
 
     depends_on:
       - db
@@ -49,7 +49,7 @@ services:
       - "${AUTHENTIK_DATA_DIR}/custom-templates:/templates:z"
     networks:
       atk_network:
-      internal_net:
+      {{ internal_network_name }}:
 
   ldap_outpost:
     hostname: ldap_outpost
@@ -60,11 +60,11 @@ services:
       - .secrets/ldap_token.env
     networks:
       atk_network:
-      internal_net:
+      {{ internal_network_name }}:
 
 networks:
   atk_network:
-  internal_net:
+  {{ internal_network_name }}:
     external: true
 
 volumes:
