@@ -2,7 +2,7 @@ db_type:
   type: str
   help: Which db does the service use?
   choices:
-    No DB: false
+    No DB: none
     Postgres: postgres
     MariaDB: mariadb
     sqlite: sqlite

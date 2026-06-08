@@ -19,7 +19,7 @@ internal_host:
   default: "{{ service_name }}"
   when: "{{ proxy_type != 'none'}}"
 internal_port:
-  type: str
+  type: int
   help: Port on which the service is listening internally.
   default: 8080
   when: "{{ proxy_type != 'none'}}"

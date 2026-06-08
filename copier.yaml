@@ -1,5 +1,5 @@
 _templates_suffix: .j2
-_answers_file: .common_config.yml
+_answers_file: .copier_config.yml
 _subdirectory: src/{{ service_name }}
 _skip_if_exists:
   - .secrets/*
@@ -10,7 +10,7 @@ compose_provider:
     Docker: docker
     Podman root: podman
     Podman rootless: podman_rootless
-  default: docker
+  default: podman
 service_name:
   type: str
   help:
@@ -58,7 +58,7 @@ internal_host:
   default: "{{ service_name }}"
   when: "{{ proxy_type != 'none'}}"
 internal_port:
-  type: str
+  type: int
   help: Port on which the service is listening internally.
   default: 8080
   when: "{{ proxy_type != 'none'}}"
@@ -112,7 +112,7 @@ db_type:
   type: str
   help: Which db does the service use?
   choices:
-    No DB: false
+    No DB: none
     Postgres: postgres
     MariaDB: mariadb
     sqlite: sqlite

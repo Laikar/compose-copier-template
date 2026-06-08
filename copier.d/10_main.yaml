@@ -1,5 +1,5 @@
 _templates_suffix: .j2
-_answers_file: .common_config.yml
+_answers_file: .copier_config.yml
 _subdirectory: src/{{ service_name }}
 _skip_if_exists:
   - ".secrets/*"
@@ -10,8 +10,7 @@ compose_provider:
     Docker: docker
     Podman root: podman
     Podman rootless: podman_rootless
-  default: "docker"
-
+  default: "podman"
 service_name:
   type: str
   help: Name of the service. This will be used for container names, network aliases, and default hostnames.
