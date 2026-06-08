@@ -23,5 +23,5 @@ http:
     {{ service_name }}:
       loadBalancer:
         servers:
-          - url: "http://{{ service_host }}:{{ internal_port }}"
+          - url: "http://{{ internal_host }}:{{ internal_port }}"
         passHostHeader: true
