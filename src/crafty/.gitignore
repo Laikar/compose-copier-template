@@ -1,0 +1,5 @@
+.secrets
+config/*.lock
+config/default-creds.txt
+config/db
+config/web/certs
