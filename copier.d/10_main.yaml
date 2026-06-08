@@ -1,5 +1,5 @@
 _templates_suffix: .j2
-_answers_file: .copier_config.yml
+_answers_file: .copier-answers.yml
 _subdirectory: src/{{ service_name }}
 _skip_if_exists:
   - ".secrets/*"
