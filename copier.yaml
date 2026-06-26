@@ -1,6 +1,6 @@
 _templates_suffix: .j2
 _answers_file: .copier-answers.yml
-_subdirectory: src/{{ service_name }}
+_subdirectory: src/{{ service_template }}
 _skip_if_exists:
   - .secrets/*
 compose_provider:
@@ -11,17 +11,28 @@ compose_provider:
     Podman root: podman
     Podman rootless: podman_rootless
   default: podman
+service_template:
+  type: str
+  choices:
+    - authentik
+    - crafty
+    - gatus
+    - traefik
+    - custom
 service_name:
   type: str
   help:
     Name of the service. This will be used for container names, network aliases,
     and default hostnames.
+  when: "{{ service_template == 'custom' }}"
+  default: "{{ service_template }}"
 config_file_name:
   type: str
   help: "Name of the configuration file for this service on each other service's
     folder. EX: trafik.yml will reside on other projects to specify their traefik
     config."
   default: ""
+  when: "{{ service_template in ['authentik','custom','traefik','gatus'] }}"
   placeholder: No file
 log_dir:
   type: str
@@ -45,7 +56,7 @@ proxy_type:
     No proxy: none
     Traefik: traefik
   help: Select the type of reverse proxy to use for this service.
-  default: none
+  default: traefik
   when: "{{ service_name not in ['traefik'] }}"
 public_domain:
   type: str
@@ -66,6 +77,7 @@ internal_network_name:
   type: str
   help: Name of the internal netowrk to comunicate with reverse proxy
   default: internal_net
+  when: "{{ proxy_type != 'none' }}"
 monitoring_types:
   type: str
   help: Types of monitoring to enable for this service.
@@ -154,3 +166,13 @@ gatus_builtin_password:
   secret: true
   default: changeme
   when: "{{ service_name == 'gatus' }}"
+traefik_http_port:
+  type: int
+  help: HTTP port to expose for traefik
+  default: 80
+  when: "{{ service_name == 'traefik' }}"
+traefik_https_port:
+  type: int
+  help: HTTPS port to expose for traefik
+  default: 443
+  when: "{{ service_name == 'traefik' }}"

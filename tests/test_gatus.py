@@ -1,33 +1,24 @@
-from copier import run_copy
 from conftest import DockerCommon
 from pathlib import Path
 import yaml
 
 
 class TestGatus(DockerCommon):
-    def render_template(self, template_paths):
-        run_copy(
-            ".",
-            template_paths.main,
-            data={
-                "service_name": "gatus",
-                "config_file_name": "gatus.yml",
-                "proxy_type": "traefik",
-                "public_domain": "gatus.example.com",
-                "internal_host": "gatus",
-                "internal_port": "gatus",
-                "monitoring_types": [],
-                "auth_types": [],
-                "gatus_builtin_username": "admin",
-                "gatus_builtin_password": "admin",
-                "db_type": False,
-                "log_dir": template_paths.logs,
-            },
-            vcs_ref="HEAD",
-            defaults=True,
-            overwrite=True,
-            unsafe=True,
-        )
+    def default_data(self, template_paths):
+        return {
+            "service_template": "gatus",
+            "config_file_name": "gatus.yml",
+            "proxy_type": "traefik",
+            "public_domain": "gatus.example.com",
+            "internal_host": "gatus",
+            "internal_port": 8080,
+            "monitoring_types": [],
+            "auth_types": [],
+            "gatus_builtin_username": "admin",
+            "gatus_builtin_password": "admin",
+            "db_type": "none",
+            "log_dir": template_paths.logs,
+        }
 
     def test_check_uptime(self, template_paths):
         self.render_template(template_paths)

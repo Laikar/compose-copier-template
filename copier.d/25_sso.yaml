@@ -18,7 +18,7 @@ ldap_search_domain:
 oidc_client_id:
   type: str
   help: OIDC client ID for the service. Defaults to the service name
-  secret: True
+  secret: true
   when: "{{ 'oidc' in auth_types }}"
   default: "{{ service_name }}"
 
@@ -28,6 +28,6 @@ oidc_client_secret:
     OIDC client secret. Use a strong secret. You can generate one with:
 
     `tr -dc 'A-Za-z0-9' </dev/urandom | head -c 20; echo`
-  secret: True
+  secret: true
   when: "{{ 'oidc' in auth_types }}"
   default: "changeme"

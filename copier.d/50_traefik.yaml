@@ -1,0 +1,11 @@
+traefik_http_port:
+  type: int
+  help: "HTTP port to expose for traefik"
+  default: 80
+  when: "{{ service_name == 'traefik' }}"
+
+traefik_https_port:
+  type: int
+  help: "HTTPS port to expose for traefik"
+  default: 443
+  when: "{{ service_name == 'traefik' }}"

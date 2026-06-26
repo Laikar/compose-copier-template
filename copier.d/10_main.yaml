@@ -1,8 +1,9 @@
 _templates_suffix: .j2
 _answers_file: .copier-answers.yml
-_subdirectory: src/{{ service_name }}
+_subdirectory: src/{{ service_template }}
 _skip_if_exists:
   - ".secrets/*"
+
 compose_provider:
   type: str
   help: Container runtime to use
@@ -11,16 +12,27 @@ compose_provider:
     Podman root: podman
     Podman rootless: podman_rootless
   default: "podman"
+
+service_template:
+  type: str
+  choices:
+    - authentik
+    - crafty
+    - gatus
+    - traefik
+    - custom
 service_name:
   type: str
   help: Name of the service. This will be used for container names, network aliases, and default hostnames.
-
+  when: "{{ service_template == 'custom' }}"
+  default: "{{ service_template }}"
 config_file_name:
   type: str
   help: >-
     Name of the configuration file for this service on each other service's folder.
     EX: trafik.yml will reside on other projects to specify their traefik config.
   default: ""
+  when: "{{ service_template in ['authentik','custom','traefik','gatus'] }}"
   placeholder: "No file"
 
 log_dir:

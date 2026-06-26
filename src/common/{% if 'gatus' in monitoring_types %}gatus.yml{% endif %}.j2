@@ -1,6 +1,6 @@
 endpoints:
 - conditions: ['[STATUS] == 200']
-  group: infra
+  group: services
   interval: 5m
-  name: authentik
+  name: gatus
   url: {{ gatus_monitoring_url }}

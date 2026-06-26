@@ -4,7 +4,7 @@ proxy_type:
     No proxy: "none"
     Traefik: "traefik"
   help: Select the type of reverse proxy to use for this service.
-  default: "none"
+  default: "traefik"
   when: "{{ service_name not in ['traefik'] }}"
 
 public_domain:
@@ -28,3 +28,4 @@ internal_network_name:
   type: str
   help: Name of the internal netowrk to comunicate with reverse proxy
   default: internal_net
+  when: "{{ proxy_type != 'none' }}"
