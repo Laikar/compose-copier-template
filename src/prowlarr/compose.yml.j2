@@ -1,0 +1,16 @@
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      TZ: {{ timezone }}
+      PUID: 1001
+      PGID: 1001
+    volumes:
+      - ./config:/config:z
+    restart: unless-stopped
+    networks:
+      internal_net:
+networks:
+  internal_net:
+    external: true

@@ -18,6 +18,10 @@ service_template:
     - crafty
     - gatus
     - traefik
+    - sonarr
+    - radarr
+    - prowlarr
+    - flaresolverr
     - custom
 service_name:
   type: str
@@ -50,6 +54,21 @@ data_dir:
 
     "
   default: /var/storage/data/{{ service_name }}
+media_library_dir:
+  type: str
+  help: "Library directory
+
+    This is where your media will be stored
+
+    "
+  default: /var/storage/library
+  when: "{{ service_template in ['sonarr','radarr','jellyfin'] }}"
+timezone:
+  type: str
+  help: "Timezone the container will run as
+
+    "
+  default: Europe/Madrid
 proxy_type:
   type: str
   choices:
@@ -61,7 +80,7 @@ proxy_type:
 public_domain:
   type: str
   help: Public domain where the service will be accessible.
-  when: "{{ proxy_type != 'none'}}"
+  when: "{{ proxy_type != 'none' or service_template == 'mediastack' }}"
   default: "{{ service_name }}.example.com"
 internal_host:
   type: str
@@ -84,6 +103,7 @@ monitoring_types:
   choices:
     Gatus: gatus
   multiselect: true
+  when: "{{ service_template  !=  'gatus' }}"
 gatus_monitoring_url:
   type: str
   help: URL that Gatus should use to monitor this service.
@@ -99,6 +119,7 @@ auth_types:
     LDAP: ldap
     Proxy: proxy
   multiselect: true
+  when: "{{ service_template != 'authentik' }}"
 ldap_search_domain:
   type: str
   help: LDAP search domain used for authentication.

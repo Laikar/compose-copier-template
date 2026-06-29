@@ -1,0 +1,17 @@
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      TZ: {{ timezone }}
+      PUID: 1001
+      PGID: 1001
+    volumes:
+      - ./config:/config:z
+      - {{ media_library_dir }}:{{ media_library_dir }}:z
+    restart: unless-stopped
+    networks:
+      internal_net:
+networks:
+  internal_net:
+    external: true

@@ -10,7 +10,7 @@ proxy_type:
 public_domain:
   type: str
   help: Public domain where the service will be accessible.
-  when: "{{ proxy_type != 'none'}}"
+  when: "{{ proxy_type != 'none' or service_template == 'mediastack' }}"
   default: "{{ service_name }}.example.com"
 
 internal_host:

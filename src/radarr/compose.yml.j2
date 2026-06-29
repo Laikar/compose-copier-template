@@ -1,0 +1,17 @@
+services:
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      PUID: 1001
+      PGID: 1001
+      TZ: {{ timezone }}
+    volumes:
+      - ./config:/config:z
+      - {{ media_library_dir }}:{{ media_library_dir }}:z
+    restart: unless-stopped
+    networks:
+      internal_net:
+networks:
+  internal_net:
+    external: true

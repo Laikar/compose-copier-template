@@ -20,6 +20,10 @@ service_template:
     - crafty
     - gatus
     - traefik
+    - sonarr
+    - radarr
+    - prowlarr
+    - flaresolverr
     - custom
 service_name:
   type: str
@@ -48,3 +52,17 @@ data_dir:
     Data directory.
     This is where the service's data will be stored.
   default: /var/storage/data/{{ service_name }}
+
+media_library_dir:
+  type: str
+  help: |
+    Library directory
+    This is where your media will be stored
+  default: /var/storage/library
+  when: "{{ service_template in ['sonarr','radarr','jellyfin'] }}"
+
+timezone:
+  type: str
+  help: |
+    Timezone the container will run as
+  default: Europe/Madrid

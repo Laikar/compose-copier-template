@@ -8,6 +8,7 @@ auth_types:
     LDAP: ldap
     Proxy: proxy
   multiselect: true
+  when: "{{ service_template != 'authentik' }}"
 
 ldap_search_domain:
   type: str

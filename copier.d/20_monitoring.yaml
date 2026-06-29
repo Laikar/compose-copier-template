@@ -4,6 +4,7 @@ monitoring_types:
   choices:
     Gatus: gatus
   multiselect: true
+  when: "{{ service_template  !=  'gatus' }}"
 
 gatus_monitoring_url:
   type: str
